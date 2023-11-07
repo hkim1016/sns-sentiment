@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Instagram Sentiment</title>
+{% endblock %}
+
+{% block body %}
+<form method="POST" action="/scrape-insta">
+    <label for="name">Enter Name of Hashtag or User</label>
+    <input type="text" id="name" name="name" required />
+    <label for="category">Category</label>
+    <select id="category" name="category">
+        <option value="hashtag">Hashtag</option>
+        <option value="profile">Profile</option>
+    </select>
+    <label for="amount">Amount of Posts to Analyze</label>
+    <input type="number" id="amount" name="amount" min="1" max="100" step="1" value="1">
+    <button type="submit">Submit</button>
+</form>
+<div>
+    Posts from Instagram Users and Hashtags are done using a python package called <a href="https://github.com/JustAnotherArchivist/snscrape" target="_blank" id="snscrape">snscrape</a>. For detecting if the language is the caption is English, a python package called <a href="https://pypi.org/project/googletrans/" target="_blank" id="googletrans">googletrans</a> is used. As a result, if what you are searching contains posts where the caption has non-english words, it may take a little bit to get your results so please be patient with it.
+</div>
+{% endblock %}

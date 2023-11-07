@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Instagram {{category}}-{{name}} Sentiment</title>
+{% endblock %}
+
+{% block body %}
+<div>
+    <p>The average sentiment compound score of the <i>{{amount}}</i> posts from instagram <i>{{category}}-{{name}}</i> is <b>{{comp_avg}}</b></p>
+    {% if comp_avg >= 0.05 %}
+        <p>The average sentiment is <b>positive</b></p>
+    {% elif comp_avg >= -0.05 %}
+        <p>The average sentiment is <b>neutral</b></p>
+    {% else %}
+        <p>The average sentiment is <b>negative</b></p>
+    {% endif %}
+    <div>
+        Vader's Scoring for Compound Values
+        <ul>
+            <li><i>[compound]</i> >= 0.05 - positive sentiment</li>
+            <li><i>[compound]</i> >= -0.05 - neutral sentiment</li>
+            <li><i>[compound]</i> &lt;= 0.05 - negative sentiment</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

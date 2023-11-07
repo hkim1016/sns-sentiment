@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>SNS Sentiment Analysis</title>
+{% endblock %}
+
+{% block body %}
+<div id="index">
+    <h3>Performs Sentiment Analysis on the following</h3>
+    <ul>
+        <li>
+            <b>Facebook</b>
+            <ul>
+                <li>Groups</li>
+            </ul>
+        </li>
+        <li>
+            <b>Instagram</b>
+            <ul>
+                <li>Hash Tags</li>
+                <li>User Profiles (Public)</li>
+            </ul>
+        </li>
+    </ul>
+    <h4>Due to recent changes to Twitter API, sentiment analysis of tweets are not available</h4>
+    <p>Sentiment Analysis was not done through my own training model but done through popular python sentiment analysis tool package <a href="https://github.com/cjhutto/vaderSentiment" target="_blank" id="vader">Vader</a>. As a result, this tool can only analyze english posts</p>
+    <div>
+        Vader's Scoring for Compound Values
+        <ul>
+            <li><i>[compound]</i> >= 0.05 - positive sentiment</li>
+            <li><i>[compound]</i> >= -0.05 - neutral sentiment</li>
+            <li><i>[compound]</i> &lt;= 0.05 - negative sentiment</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

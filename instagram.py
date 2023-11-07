@@ -6,46 +6,49 @@ from snscrape.modules.instagram import InstagramUserScraper
 
 translator = Translator()
 
-def scrape_insta_hashtag(hashtag):
-    scraper = InstagramHashtagScraper('camera')
+def scrape_insta_hashtag(hashtag, amount):
+    scraper = InstagramHashtagScraper(hashtag)
 
     posts = []
 
     for i, item in enumerate(scraper.get_items()):
         if translator.detect(item.content).lang == 'en':
             posts.append(item)
-        if len(posts) > 30:
+        if len(posts) > int(amount):
             break
 
     df = pd.DataFrame(posts)
-    df.to_csv('insta-tag.csv')
+    df.to_csv('./insta/insta-tag.csv')
 
     captions = df['content'].tolist()
 
-    f=open('insta-tag-captions.txt', 'w+')
+    f=open('./insta/insta-tag-captions.txt', 'w+')
     for caption in captions:
         f.write(caption)
     f.close()
 
-    f = open("insta-tag.txt","w+")
+    # f = open("insta-tag.txt","w+")
+    all_compounds = []
     analyzer = SentimentIntensityAnalyzer()
     for caption in captions:
         vs = analyzer.polarity_scores(caption)
-        f.write(caption)
-        f.write(str(vs))
-        f.write('\n\n')
+        all_compounds.append(vs['compound'])
+        # f.write(caption)
+        # f.write(str(vs))
+        # f.write('\n\n')
         # print("{:-<65} {}".format(caption, str(vs)))
-    f.close()
+    # f.close()
+    return all_compounds
 
-def scrape_insta_user(user):
-    scraper = InstagramUserScraper('daquan')
+def scrape_insta_user(user, amount):
+    scraper = InstagramUserScraper(user)
 
     posts = []
 
     for i, item in enumerate(scraper.get_items()):
         if translator.detect(item.content).lang == 'en':
             posts.append(item)
-        if len(posts) > 30:
+        if len(posts) > int(amount):
             break
 
     df = pd.DataFrame(posts)
@@ -58,21 +61,31 @@ def scrape_insta_user(user):
         f.write(caption)
     f.close()
 
-    f = open("./insta/insta-user.txt","w+")
+    # f = open("./insta/insta-user.txt","w+")
+    all_compounds = []
     analyzer = SentimentIntensityAnalyzer()
     for caption in captions:
         vs = analyzer.polarity_scores(caption)
-        f.write(caption)
-        f.write(str(vs))
-        f.write('\n\n')
+        all_compounds.append(vs['compound'])
+        # f.write(caption)
+        # f.write(str(vs))
+        # f.write('\n\n')
         # print("{:-<65} {}".format(caption, str(vs)))
-    f.close()
+    # f.close()
+    return all_compounds
 
+def get_insta_compound(name, category, amount):
+    if category == 'hashtag':
+        compounds = scrape_insta_hashtag(name, amount)
+    if category == 'profile':
+        compounds = scrape_insta_user(name, amount)
+    sum = 0
+    for compound in compounds:
+        sum += compound
+    return round(sum / len(compounds), 4)
 
-scrape_insta_user('')
-
-
-
+if __name__ == '__main__':
+    get_insta_compound('camera', 'hashtag', 3)
 
 
 

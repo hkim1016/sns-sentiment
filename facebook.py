@@ -11,13 +11,14 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from decouple import config
 import time
 
-def scrape_fb_group(group):
+def scrape_fb_group(group_id, amount):
     chromedriver_autoinstaller_fix.install()
 
     option = Options()
     option.add_argument("--disable-infobars")
     option.add_argument("start-maximized")
     option.add_argument("--disable-extensions")
+    option.add_argument("--headless")
     option.add_experimental_option("prefs", { "profile.default_content_setting_values.notifications": 2})
 
     driver = webdriver.Chrome(options=option)
@@ -35,15 +36,15 @@ def scrape_fb_group(group):
     pass_field.send_keys(config('FB_PASS'))
     loginbtn.click()
 
-    time.sleep(2)
+    time.sleep(1)
 
     # driver.get('https://www.facebook.com/davin.ko.94')
-    driver.get('https://www.facebook.com/groups/2377869205777593')
+    driver.get(f'https://www.facebook.com/groups/{group_id}') #2377869205777593
     time.sleep(1)
     fb_page = BeautifulSoup(driver.page_source, 'html.parser')
 
     posts = set()
-    while len(posts) <= 5:
+    while len(posts) <= int(amount):
         soup=BeautifulSoup(driver.page_source,"html.parser")
         all_posts=soup.find_all("div",{"class":"x1yztbdb x1n2onr6 xh8yej3 x1ja2u2z"})
         for post in all_posts:
@@ -55,18 +56,29 @@ def scrape_fb_group(group):
                 post_text="not found"
             # print(post_text)
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(3)
+        time.sleep(1)
 
     driver.quit()
 
-    f = open("./fb/fb.txt","w+")
+    # f = open("./fb/fb.txt","w+")
+    all_compounds = []
     analyzer = SentimentIntensityAnalyzer()
     for post in posts:
         vs = analyzer.polarity_scores(post)
-        f.write(post)
-        f.write(str(vs))
-        f.write('\n\n')
-        print("{:-<65} {}".format(post, str(vs)))
-    f.close()
+        all_compounds.append(vs['compound'])
+        # f.write(post)
+        # f.write(str(vs))
+        # f.write('\n\n')
+        # print("{:-<65} {}".format(post, str(vs)))
+    # f.close()
+    return all_compounds
 
-scrape_fb_group('')
+def get_fb_group_compound(group, amount):
+    compounds = scrape_fb_group(group, amount)
+    sum = 0
+    for compound in compounds:
+        sum += compound
+    return round(sum / len(compounds), 4)
+
+if __name__ == '__main__':
+    print(get_fb_group_compound(''))
