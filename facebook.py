@@ -17,10 +17,13 @@ def scrape_fb_group(group_id, amount):
     options.add_argument("start-maximized")
     options.add_argument("--disable-extensions")
     options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
     options.add_argument("--headless")
     options.add_experimental_option("prefs", { "profile.default_content_setting_values.notifications": 2})
 
     # service = Service("./chromedriver")
+
     driver = webdriver.Remote(command_executor="http://chrome:4444/wd/hub", options=options)
 
     url = "https://www.facebook.com"
@@ -61,12 +64,14 @@ def scrape_fb_group(group_id, amount):
         time.sleep(2)
 
     driver.quit()
+    print(posts)
 
     all_compounds = []
     analyzer = SentimentIntensityAnalyzer()
     for post in posts:
         vs = analyzer.polarity_scores(post)
         all_compounds.append(vs['compound'])
+
     return all_compounds
 
 def get_fb_group_compound(group, amount):

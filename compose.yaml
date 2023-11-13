@@ -4,9 +4,10 @@ services:
     ports:
       - 4444:4444
   sns-sentiment:
-    build:
-      context: .
-      shm_size: 2gb
+    # build:
+    #   context: .
+    #   shm_size: 2gb
+    image: hkim1016/sns-sentiment
     shm_size: 2gb
     ports:
       - 3000:3000
