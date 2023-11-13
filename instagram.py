@@ -18,26 +18,14 @@ def scrape_insta_hashtag(hashtag, amount):
             break
 
     df = pd.DataFrame(posts)
-    df.to_csv('./insta/insta-tag.csv')
 
     captions = df['content'].tolist()
 
-    f=open('./insta/insta-tag-captions.txt', 'w+')
-    for caption in captions:
-        f.write(caption)
-    f.close()
-
-    # f = open("insta-tag.txt","w+")
     all_compounds = []
     analyzer = SentimentIntensityAnalyzer()
     for caption in captions:
         vs = analyzer.polarity_scores(caption)
         all_compounds.append(vs['compound'])
-        # f.write(caption)
-        # f.write(str(vs))
-        # f.write('\n\n')
-        # print("{:-<65} {}".format(caption, str(vs)))
-    # f.close()
     return all_compounds
 
 def scrape_insta_user(user, amount):
@@ -52,26 +40,14 @@ def scrape_insta_user(user, amount):
             break
 
     df = pd.DataFrame(posts)
-    df.to_csv('./insta/insta-user.csv')
 
     captions = df['content'].tolist()
 
-    f=open('./insta/insta-user-captions.txt', 'w+')
-    for caption in captions:
-        f.write(caption)
-    f.close()
-
-    # f = open("./insta/insta-user.txt","w+")
     all_compounds = []
     analyzer = SentimentIntensityAnalyzer()
     for caption in captions:
         vs = analyzer.polarity_scores(caption)
         all_compounds.append(vs['compound'])
-        # f.write(caption)
-        # f.write(str(vs))
-        # f.write('\n\n')
-        # print("{:-<65} {}".format(caption, str(vs)))
-    # f.close()
     return all_compounds
 
 def get_insta_compound(name, category, amount):

@@ -1,9 +1,9 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-import chromedriver_autoinstaller_fix
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from bs4 import BeautifulSoup
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
@@ -12,16 +12,16 @@ from decouple import config
 import time
 
 def scrape_fb_group(group_id, amount):
-    chromedriver_autoinstaller_fix.install()
+    options = webdriver.ChromeOptions()
+    options.add_argument("--disable-infobars")
+    options.add_argument("start-maximized")
+    options.add_argument("--disable-extensions")
+    options.add_argument('--no-sandbox')
+    options.add_argument("--headless")
+    options.add_experimental_option("prefs", { "profile.default_content_setting_values.notifications": 2})
 
-    option = Options()
-    option.add_argument("--disable-infobars")
-    option.add_argument("start-maximized")
-    option.add_argument("--disable-extensions")
-    option.add_argument("--headless")
-    option.add_experimental_option("prefs", { "profile.default_content_setting_values.notifications": 2})
-
-    driver = webdriver.Chrome(options=option)
+    # service = Service("./chromedriver")
+    driver = webdriver.Remote(command_executor="http://chrome:4444/wd/hub", options=options)
 
     url = "https://www.facebook.com"
     driver.get(url)
@@ -38,39 +38,35 @@ def scrape_fb_group(group_id, amount):
 
     time.sleep(1)
 
-    # driver.get('https://www.facebook.com/davin.ko.94')
-    driver.get(f'https://www.facebook.com/groups/{group_id}') #2377869205777593
+    driver.get(f'https://www.facebook.com/groups/{group_id}')
     time.sleep(1)
-    fb_page = BeautifulSoup(driver.page_source, 'html.parser')
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
 
     posts = set()
-    while len(posts) <= int(amount):
-        soup=BeautifulSoup(driver.page_source,"html.parser")
+    print(int(amount))
+    while len(posts) < int(amount):
+        print(len(posts))
         all_posts=soup.find_all("div",{"class":"x1yztbdb x1n2onr6 xh8yej3 x1ja2u2z"})
         for post in all_posts:
             try:
-                # name=post.find("a",{"class":"x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz xt0b8zv xzsf02u x1s688f"}).get_text()
                 post_text=post.find("div", {"class": "xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs x126k92a"}).get_text()
+                print(post_text)
                 posts.add(post_text)
+                if len(posts) > int(amount):
+                    break
             except:
                 post_text="not found"
-            # print(post_text)
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(1)
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        time.sleep(2)
 
     driver.quit()
 
-    # f = open("./fb/fb.txt","w+")
     all_compounds = []
     analyzer = SentimentIntensityAnalyzer()
     for post in posts:
         vs = analyzer.polarity_scores(post)
         all_compounds.append(vs['compound'])
-        # f.write(post)
-        # f.write(str(vs))
-        # f.write('\n\n')
-        # print("{:-<65} {}".format(post, str(vs)))
-    # f.close()
     return all_compounds
 
 def get_fb_group_compound(group, amount):
