@@ -57,4 +57,4 @@ COPY . .
 EXPOSE 3000
 
 # Run the application.
-CMD gunicorn 'wsgi:app' --bind=0.0.0.0:3000 --timeout 100
+CMD gunicorn --workers=4 'wsgi:app' --bind=0.0.0.0:3000 --timeout 200

@@ -60,6 +60,7 @@ def scrape_fb_group(group_id, amount):
             except:
                 post_text="not found"
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        soup.decompose()
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         time.sleep(2)
 
